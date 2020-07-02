@@ -38,7 +38,7 @@ describe('with a changed version', () => {
       '::set-output name=previous-version::1.2.3',
       'Current version: 2.0.0',
       '::set-output name=current-version::2.0.0',
-      'Creating tag v2.0.0',
+      'Creating annotated tag v2.0.0 with message "v2.0.0"',
       '::set-output name=tag::v2.0.0',
     ]);
   });

@@ -2,7 +2,7 @@ name: Detect and Tag New Version
 description: >
   Tag new versions in your repository based on changes to its contents,
   like a `package.json` or `.gemspec` file.
-author: dfreeman
+author: steve9164
 inputs:
   version-command:
     description: >

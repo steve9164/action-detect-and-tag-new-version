@@ -1,0 +1,18 @@
+name: 'auto-tag'
+on: # tag releases
+  push:
+    branches:
+      - 'releases/*'
+
+jobs:
+  tag-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+
+      - name: Tag new version
+        uses: ./
+        with:
+          tag-template: 'v{VERSION}'
