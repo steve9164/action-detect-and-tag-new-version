@@ -22,10 +22,35 @@ describe('with a changed version', () => {
     await execa('git', ['commit', '-am', 'Bump version']);
   });
 
-  test('creates a new tag', async () => {
+  test('creates a new lightweight tag', async () => {
     let result = await execa.node(`${__dirname}/../lib/main.js`, {
       env: {
         GITHUB_REF: 'master',
+        'INPUT_USE-ANNOTATED-TAG': 'false',
+      },
+    });
+
+    // Ensure tags exist here and upstream
+    await execa('git', ['rev-parse', 'v2.0.0']);
+    await execa('git', ['rev-parse', 'v2.0.0'], { cwd: 'upstream' });
+
+    expect(result.stdout.trim().split('\n')).toEqual([
+      'Previous version: 1.2.3',
+      '::set-output name=previous-version::1.2.3',
+      'Current version: 2.0.0',
+      '::set-output name=current-version::2.0.0',
+      'Creating tag v2.0.0',
+      '::set-output name=tag::v2.0.0',
+    ]);
+  });
+
+  test('creates a new annotated tag', async () => {
+    let result = await execa.node(`${__dirname}/../lib/main.js`, {
+      env: {
+        GITHUB_REF: 'master',
+        'INPUT_USE-ANNOTATED-TAG': 'true',
+        'INPUT_TAGGER-NAME': 'Test Author',
+        'INPUT_TAGGER-EMAIL': 'test.author@example.com',
       },
     });
 
