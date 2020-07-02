@@ -38,7 +38,7 @@ All inputs are optional.
  - `tag-template`: a template for producing a tag name from the current version of your repository. Any instance of
    `{VERSION}` in the string will be replaced with the actual detected version. Defaults to `v{VERSION}`.
 - `use-annotated-tag`: set to `false` to create only a lightweight tag or `true` for an annotated tag with a tag message. 
-   Defaults to `true`.
+   Defaults to `false`.
 - `tag-message-template`: a template for producing a tag message from the current version of your repository. Any instance of
    `{VERSION}` in the string will be replaced with the actual detected version. Defaults to copying `tag-template`.
 
@@ -55,3 +55,22 @@ If no `version-command` input is provided, this action will attempt to do someth
  - If it finds single `*.gemspec` file, it will consider the version defined there to be the repository version.
 
 The logic for this detection and the corresponding version commands used can be found in [`determine-version.ts`](src/determine-version.ts).
+
+## Release guide (Stephen Davies)
+
+* Development should be done on or merged into master.
+* When tests pass the version can be bumped on master and merged into `releases/v*`:
+```
+# Bump version on master & commit, then
+git checkout releases/v1
+git merge master --no-ff --no-commit
+yarn all
+git add dist/
+git commit
+```
+* This is so that the auto-tagger doesn't tag the version bump without the code update (checking in `dist/`)
+* Then test the action and force tag it with the correct major version:
+```
+git tag -fa v1 -m "v1"
+```
+
