@@ -6,8 +6,8 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
+    "format": "prettier --write **/*",
+    "format-check": "prettier --check **/*",
     "lint": "eslint src/**/*.ts",
     "package": "ncc build",
     "test": "jest",
@@ -22,7 +22,10 @@
     "node",
     "setup"
   ],
-  "author": "Dan Freeman",
+  "author": "Stephen Davies",
+  "contributors": [
+    "Dan Freeman"
+  ],
   "license": "MIT",
   "dependencies": {
     "@actions/core": "^1.2.0",

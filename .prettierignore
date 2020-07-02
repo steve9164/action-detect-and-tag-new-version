@@ -1,3 +1,19 @@
-dist/
-lib/
-node_modules/
+# Ignore everything
+*
+
+# Unignore specific directories to all depths
+!src/**/
+!__tests__/**/
+!.github/**/
+!.vscode/**/
+
+# Unignore files
+!**/*.js
+!**/*.ts
+!**/*.json
+!**/*.yml
+
+# Ignore certain files
+package-lock.json
+tsconfig.json
+.eslintrc.json

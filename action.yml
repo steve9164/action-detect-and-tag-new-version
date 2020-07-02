@@ -17,6 +17,14 @@ inputs:
       A template for producing a tag name from the current version of your
       repository, replacing '{VERSION}' with the deteced version.
     default: 'v{VERSION}'
+  use-annotated-tag:
+    description: >
+      Whether or not to add a tag message to create an annotated tag.
+    default: true
+  tag-message-template:
+    description: >
+      A template for producing a tag message from the current version of your
+      repository, replacing '{VERSION}' with the deteced version.
 outputs:
   previous-version:
     description: the detected previous version of this repository

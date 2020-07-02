@@ -22,14 +22,21 @@ async function run(): Promise<void> {
   if (currentVersion !== previousVersion && getInput('create-tag') !== 'false') {
     let tagTemplate = getInput('tag-template') || 'v{VERSION}';
     let tag = tagTemplate.replace(/{VERSION}/g, currentVersion);
+    let useAnnotatedTag = getInput('use-annotated-tag') !== 'false';
+    let tagMessageTemplate = getInput('tag-message-template') || tag;
+    let tagMessage = tagMessageTemplate.replace(/{VERSION}/g, currentVersion);
 
     if (await refExists(tag)) {
       info(`Tag ${tag} already exists`);
     } else {
-      info(`Creating tag ${tag}`);
+      if (useAnnotatedTag) {
+        info(`Creating annotated tag ${tag} with message "${tagMessage}"`);
+      } else {
+        info(`Creating tag ${tag}`);
+      }
       setOutput('tag', tag);
 
-      await createTag(tag);
+      await createTag(tag, useAnnotatedTag ? tagMessage : undefined);
     }
   }
 }

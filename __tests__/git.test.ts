@@ -42,7 +42,7 @@ describe('refExists', () => {
 });
 
 describe('createTag', () => {
-  test('creates and pushes the given tag', async () => {
+  test('creates and pushes the given lightweight tag', async () => {
     await initRepository('upstream');
     await addAndTrackRemote('foo', 'upstream/.git');
 
@@ -50,8 +50,29 @@ describe('createTag', () => {
 
     let localTag = await execa('git', ['tag']);
     expect(localTag.stdout.trim()).toBe('foo-bar');
+    let localTagCheckLightweight = await execa('git', ['cat-file', '-t', 'foo-bar']);
+    expect(localTagCheckLightweight.stdout.trim()).toBe('commit');
 
     let remoteTag = await execa('git', ['tag'], { cwd: 'upstream' });
     expect(remoteTag.stdout.trim()).toBe('foo-bar');
+    let remoteTagCheckLightweight = await execa('git', ['cat-file', '-t', 'foo-bar']);
+    expect(remoteTagCheckLightweight.stdout.trim()).toBe('commit');
+  });
+
+  test('creates and pushes an annotated tag with a message', async () => {
+    await initRepository('upstream');
+    await addAndTrackRemote('foo', 'upstream/.git');
+
+    await git.createTag('foo-bar', 'tag message');
+
+    let localTag = await execa('git', ['tag', '-n']);
+    expect(localTag.stdout.trim()).toMatch(/foo-bar\s*tag message/);
+    let localTagCheckAnnotated = await execa('git', ['cat-file', '-t', 'foo-bar']);
+    expect(localTagCheckAnnotated.stdout.trim()).toBe('tag');
+
+    let remoteTag = await execa('git', ['tag', '-n'], { cwd: 'upstream' });
+    expect(remoteTag.stdout.trim()).toMatch(/foo-bar\s*tag message/);
+    let remoteTagCheckAnnotated = await execa('git', ['cat-file', '-t', 'foo-bar']);
+    expect(remoteTagCheckAnnotated.stdout.trim()).toBe('tag');
   });
 });

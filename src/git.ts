@@ -25,7 +25,8 @@ export async function checkout(ref: string): Promise<void> {
   await execa('git', ['checkout', ref]);
 }
 
-export async function createTag(name: string): Promise<void> {
-  await execa('git', ['tag', name]);
+export async function createTag(name: string, message?: string | undefined): Promise<void> {
+  const messageArgs = message ? ['-m', message] : [];
+  await execa('git', ['tag', name, ...messageArgs]);
   await execa('git', ['push', '--tags']);
 }

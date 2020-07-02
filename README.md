@@ -1,4 +1,6 @@
-# Detect and Tag New Version [![test-status](https://github.com/dfreeman/action-detect-and-tag-new-version/workflows/CI/badge.svg)](https://github.com/dfreeman/action-detect-and-tag-new-version/actions?query=workflow%3ACI)
+# Detect and Tag New Version
+
+Forked from [dfreeman/action-detect-and-tag-new-version by Dan Freeman](https://github.com/dfreeman/action-detect-and-tag-new-version).
 
 This action allows you to detect a new version of your repository based on some change in its contents between commits, creating a git tag if a new version is detected.
 
@@ -35,6 +37,10 @@ All inputs are optional.
  - `create-tag`: may be set to `false` to only detect version changes and not create a new tag when the version changes.
  - `tag-template`: a template for producing a tag name from the current version of your repository. Any instance of
    `{VERSION}` in the string will be replaced with the actual detected version. Defaults to `v{VERSION}`.
+- `use-annotated-tag`: set to `false` to create only a lightweight tag or `true` for an annotated tag with a tag message. 
+   Defaults to `true`.
+- `tag-message-template`: a template for producing a tag message from the current version of your repository. Any instance of
+   `{VERSION}` in the string will be replaced with the actual detected version. Defaults to copying `tag-template`.
 
 ### Outputs
 
