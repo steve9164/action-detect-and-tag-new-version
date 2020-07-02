@@ -1780,12 +1780,17 @@ async function checkout(ref) {
     await execa_1.default('git', ['checkout', ref]);
 }
 exports.checkout = checkout;
-async function createTag(name, message) {
-    const messageArgs = message ? ['-m', message] : [];
-    await execa_1.default('git', ['tag', name, ...messageArgs]);
+async function createLightweightTag(name) {
+    await execa_1.default('git', ['tag', name]);
     await execa_1.default('git', ['push', '--tags']);
 }
-exports.createTag = createTag;
+exports.createLightweightTag = createLightweightTag;
+async function createAnnotatedTag({ tag, tagMessage, taggerName, taggerEmail, }) {
+    const configArgs = ['-c', `user.name=${taggerName}`, '-c', `user.email=${taggerEmail}`];
+    await execa_1.default('git', [...configArgs, 'tag', tag, '-m', tagMessage]);
+    await execa_1.default('git', ['push', '--tags']);
+}
+exports.createAnnotatedTag = createAnnotatedTag;
 
 
 /***/ }),
@@ -1988,20 +1993,28 @@ async function run() {
         let tagTemplate = core_1.getInput('tag-template') || 'v{VERSION}';
         let tag = tagTemplate.replace(/{VERSION}/g, currentVersion);
         let useAnnotatedTag = core_1.getInput('use-annotated-tag') !== 'false';
-        let tagMessageTemplate = core_1.getInput('tag-message-template') || tag;
-        let tagMessage = tagMessageTemplate.replace(/{VERSION}/g, currentVersion);
         if (await git_1.refExists(tag)) {
             core_1.info(`Tag ${tag} already exists`);
         }
         else {
             if (useAnnotatedTag) {
+                let tagMessageTemplate = core_1.getInput('tag-message-template') || tag;
+                let tagMessage = tagMessageTemplate.replace(/{VERSION}/g, currentVersion);
+                const taggerName = core_1.getInput('tagger-name', { required: true });
+                const taggerEmail = core_1.getInput('tagger-email', { required: true });
                 core_1.info(`Creating annotated tag ${tag} with message "${tagMessage}"`);
+                await git_1.createAnnotatedTag({
+                    tag,
+                    tagMessage,
+                    taggerName,
+                    taggerEmail,
+                });
             }
             else {
                 core_1.info(`Creating tag ${tag}`);
+                await git_1.createLightweightTag(tag);
             }
             core_1.setOutput('tag', tag);
-            await git_1.createTag(tag, useAnnotatedTag ? tagMessage : undefined);
         }
     }
 }

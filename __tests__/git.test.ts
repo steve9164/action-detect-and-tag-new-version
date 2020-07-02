@@ -46,7 +46,7 @@ describe('createTag', () => {
     await initRepository('upstream');
     await addAndTrackRemote('foo', 'upstream/.git');
 
-    await git.createTag('foo-bar');
+    await git.createLightweightTag('foo-bar');
 
     let localTag = await execa('git', ['tag']);
     expect(localTag.stdout.trim()).toBe('foo-bar');
@@ -63,16 +63,28 @@ describe('createTag', () => {
     await initRepository('upstream');
     await addAndTrackRemote('foo', 'upstream/.git');
 
-    await git.createTag('foo-bar', 'tag message');
+    await git.createAnnotatedTag({
+      tag: 'foo-bar',
+      tagMessage: 'tag message',
+      taggerName: 'Automated Test',
+      taggerEmail: 'test@example.com',
+    });
 
-    let localTag = await execa('git', ['tag', '-n']);
-    expect(localTag.stdout.trim()).toMatch(/foo-bar\s*tag message/);
-    let localTagCheckAnnotated = await execa('git', ['cat-file', '-t', 'foo-bar']);
-    expect(localTagCheckAnnotated.stdout.trim()).toBe('tag');
+    const catFileLines = [
+      /^object/,
+      /^type commit$/,
+      /^tag foo-bar$/,
+      /^tagger Automated Test <test@example.com>/,
+      /^$/,
+      /^tag message$/,
+    ];
 
-    let remoteTag = await execa('git', ['tag', '-n'], { cwd: 'upstream' });
-    expect(remoteTag.stdout.trim()).toMatch(/foo-bar\s*tag message/);
-    let remoteTagCheckAnnotated = await execa('git', ['cat-file', '-t', 'foo-bar']);
-    expect(remoteTagCheckAnnotated.stdout.trim()).toBe('tag');
+    let localTagCheckAnnotated = await execa('git', ['cat-file', 'tag', 'foo-bar']);
+    let localLines = localTagCheckAnnotated.stdout.trim().split('\n');
+    catFileLines.forEach((re, i) => expect(localLines[i]).toMatch(re));
+
+    let remoteTagCheckAnnotated = await execa('git', ['cat-file', 'tag', 'foo-bar']);
+    let remoteLines = remoteTagCheckAnnotated.stdout.trim().split('\n');
+    catFileLines.forEach((re, i) => expect(remoteLines[i]).toMatch(re));
   });
 });

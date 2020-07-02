@@ -20,11 +20,20 @@ inputs:
   use-annotated-tag:
     description: >
       Whether or not to add a tag message to create an annotated tag.
-    default: true
+    default: false
   tag-message-template:
     description: >
       A template for producing a tag message from the current version of your
-      repository, replacing '{VERSION}' with the deteced version.
+      repository, replacing '{VERSION}' with the deteced version. Only used
+      when use-annotated-tag is "true".
+  tagger-name:
+    description: >
+      The name for git to associate with the tag. Must be provided when 
+      use-annotated-tag is "true".
+  tagger-email:
+    description: >
+      The email for git to associate with the tag. Must be provided when 
+      use-annotated-tag is "true".
 outputs:
   previous-version:
     description: the detected previous version of this repository
