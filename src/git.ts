@@ -25,8 +25,23 @@ export async function checkout(ref: string): Promise<void> {
   await execa('git', ['checkout', ref]);
 }
 
-export async function createTag(name: string, message?: string | undefined): Promise<void> {
-  const messageArgs = message ? ['-m', message] : [];
-  await execa('git', ['tag', name, ...messageArgs]);
+export async function createLightweightTag(name: string): Promise<void> {
+  await execa('git', ['tag', name]);
+  await execa('git', ['push', '--tags']);
+}
+
+export async function createAnnotatedTag({
+  tag,
+  tagMessage,
+  taggerName,
+  taggerEmail,
+}: {
+  tag: string;
+  tagMessage: string;
+  taggerName: string;
+  taggerEmail: string;
+}): Promise<void> {
+  const configArgs = ['-c', `user.name=${taggerName}`, '-c', `user.email=${taggerEmail}`];
+  await execa('git', [...configArgs, 'tag', tag, '-m', tagMessage]);
   await execa('git', ['push', '--tags']);
 }

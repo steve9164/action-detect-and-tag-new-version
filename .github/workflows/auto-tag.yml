@@ -16,3 +16,6 @@ jobs:
         uses: ./
         with:
           tag-template: 'v{VERSION}'
+          use-annotated-tag: 'true'
+          taggerName: 'Stephen Davies via GitHub Actions'
+          taggerEmail: 'steve9164@gmail.com'

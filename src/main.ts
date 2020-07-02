@@ -1,6 +1,12 @@
-import { getInput, setFailed, setOutput, info } from '@actions/core';
+import { getInput, info, setFailed, setOutput } from '@actions/core';
 import { determineVersion } from './determine-version';
-import { validateHistoryDepth, checkout, createTag, refExists } from './git';
+import {
+  checkout,
+  createAnnotatedTag,
+  createLightweightTag,
+  refExists,
+  validateHistoryDepth,
+} from './git';
 import { getEnv } from './utils';
 
 async function run(): Promise<void> {
@@ -23,20 +29,29 @@ async function run(): Promise<void> {
     let tagTemplate = getInput('tag-template') || 'v{VERSION}';
     let tag = tagTemplate.replace(/{VERSION}/g, currentVersion);
     let useAnnotatedTag = getInput('use-annotated-tag') !== 'false';
-    let tagMessageTemplate = getInput('tag-message-template') || tag;
-    let tagMessage = tagMessageTemplate.replace(/{VERSION}/g, currentVersion);
 
     if (await refExists(tag)) {
       info(`Tag ${tag} already exists`);
     } else {
       if (useAnnotatedTag) {
+        let tagMessageTemplate = getInput('tag-message-template') || tag;
+        let tagMessage = tagMessageTemplate.replace(/{VERSION}/g, currentVersion);
+
+        const taggerName = getInput('tagger-name', { required: true });
+        const taggerEmail = getInput('tagger-email', { required: true });
+
         info(`Creating annotated tag ${tag} with message "${tagMessage}"`);
+        await createAnnotatedTag({
+          tag,
+          tagMessage,
+          taggerName,
+          taggerEmail,
+        });
       } else {
         info(`Creating tag ${tag}`);
+        await createLightweightTag(tag);
       }
       setOutput('tag', tag);
-
-      await createTag(tag, useAnnotatedTag ? tagMessage : undefined);
     }
   }
 }
