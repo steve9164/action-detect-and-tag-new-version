@@ -95,6 +95,6 @@ typings/
 Thumbs.db
 
 # Ignore built ts files
+# dist is not excluded here so that releases include dist
 __tests__/runner/*
 /lib/
-/dist/
